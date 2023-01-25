@@ -23,33 +23,31 @@
 
 </div>
 
-## Motivation
-I am such a huge fan of Storybook, and I have been using it for quite some time now. Since Storybook is purely based on React, I thought of this addon as the best way to appeal to more Angular developers. I really hope this will be a good addon to use alongside Storybook for Angular projects, maybe someday integrate these features into official Storybook libraries. I will be working on new features all the time. Your feedback is much appreciated.
+```
+## Announcement
 
-For this addon, I am aiming for it to be:
+I have recently decided on splitting this addon into multiple other addons. So, we will be moving to @storybook-extras repo which will contain all the addons. This will make it easier to maintain and also to add new features. I will be working on this in the next few weeks.
+
+This addon will be deprecated in favor of the new addons. And it will be pointing to the new addons for the features. So, you can still use it as it is. But, I will be adding new features to the new addons.
+
+For more information the features and new addons, please refer to the documentation available at the [`@storybook-extras`](https://github.com/sheriffMoose/storybook-extras) repo.
+```
+
+
+## Features
 
 -   ⚡️ Zero config setup.
 -   📚 Supports latest Storybook v7.
--   🙌 Introduce `must-have` features for `Storybook` on `Angular` .
--   🐱‍🏍 Integrate as much `nice-to-have` features as possible.
+-   🅰️ Supports latest Angular v15.
+-   📔 Coverage Instrumentation for Test-Runner
+-   🧪 Auto injector for Angular services
+-   🦥 Lazy loading documentation
+-   💬 Source code display
+-   🌯 Story Wrappers selector toolbar
+-   💻 Console Logs Panel
+-   📃 Auto Markdown & HTML Docs support
+-   👨‍💻 Swagger/OpenAPI Integration
 
-<h2>Table of Contents</h2>
-
-- [Motivation](#motivation)
-- [Getting started](#getting-started)
-- [Demo/Chromatic](#demochromatic)
-- [Angular Specific Features](#angular-specific-features)
-  - [Test Runner Coverage Instrumentation](#test-runner-coverage-instrumentation)
-  - [Angular Services Unit Testing](#angular-services-unit-testing)
-  - [Documentation Lazy Loading](#documentation-lazy-loading)
-  - [Source Code](#source-code)
-  - [Wrappers Selector](#wrappers-selector)
-- [Framework Agnostic Features](#framework-agnostic-features)
-  - [Console Logs](#console-logs)
-  - [Auto Markdown/HTML Support](#auto-markdownhtml-support)
-  - [Swagger/OpenAPI Integration](#swaggeropenapi-integration)
-- [Credits](#credits)
-- [Roadmap](#roadmap)
 
 ## Getting started
 
@@ -79,240 +77,21 @@ module.exports = {
 Find the published demo storybook on chromatic [here](https://master--63c1a45beed1a8f036a44e28.chromatic.com/)
 
 
-## Angular Specific Features
 
-These particular features I found to be helpful when integrating Storybook into existing projects. Feel free to request any more features that you may find a must or even just nice-to-have 😊.
+## Migration Plan
 
--   📔 Coverage Instrumentation for Test-Runner
--   🧪 Auto injector for Angular services
--   🦥 Lazy loading documentation
--   💬 Source code display
--   🌯 Story Wrappers selector toolbar
+These features each have their own addon, and are available for all frameworks. They still work the same way as before, but are under new name and new refactored code.
 
-
-### Test Runner Coverage Instrumentation
-
-Credits to `JS Devtools` for their amazing [`coverage istanbul loader`](https://jstools.dev/coverage-istanbul-loader). This addon simply imports `@jsdevtools/coverage-istanbul-loader` into webpack configuration to enable the coverage instrumentation.
-
-Read more about the coverage instrumentation in the official Test Runner documentation [here](https://github.com/storybookjs/test-runner#setting-up-code-coverage).
-
-Simply running `test-storybook --coverage` will show you test results coverage in the terminal and also will save the coverage results into coverage/storybook.
-
-### Angular Services Unit Testing
-
--   This feature is for developers who want their testing to all run in the same place.
--   Particulary this is helpful when you want to move business logic from components into services.
--   But you still want to test it through Storybook.
--   This feature does not require any setup. It relies on the official `@storybook/angular` implementation.
--   It simply injects the service into an `APP_INITIALIZER` which runs before the `Angular` application starts.
--   When the initializer runs, it puts the service instance into `parameters.providers` which you can retrieve in the play function like so:
-
-```jsx
-const meta: Meta = {
-    title: 'Services/AppService',
-    decorators: [
-        moduleMetadata({
-            imports: [AppModule, CommonModule],
-            providers: [AppService],
-        }),
-    ]
-};
-
-export default meta;
-
-export const Primary: StoryObj = {
-    play: async ({ parameters: { providers } }) => {
-        const appService: AppService = providers.AppService;
-
-        expect(appService).toBeTruthy();
-    },
-};
-```
-
-### Documentation Lazy Loading
-
--   This feature uses `node-fetch` to load the `documentation.json` file during runtime, specifically in the preview iframe before the load of each story.
--   This is very helpful if you are doing active development and your documentation is being updated regularly.
--   This is also helpful if your application is already published along with its documentation and you need to load that remotely served documentation.
-
-Here is a simple example of the first scenario:
-
--   execute compodoc into a specific directory
-    ```
-    compodoc -e json -d dist/docs
-    ```
--   Make sure to include static dir like so
-
-```jsx
-// .storybook/main.js
-module.exports = {
-    staticDirs: [{ from: '<DOCS_DIR_PATH>', to: '/<DOCS_SERVE_DIR>' }],
-};
-```
-
--   Next, enable the documentation lazy loading in the `preview.js` file like so:
-
-```jsx
-export const parameters = {
-    ...
-    docs: {
-        inlineStories: true,
-        ...
-        lazyLoad: true,
-        url: '<DOCS_SERVE_DIR>/documentation.json'
-    }
-}
-```
-
-The url property here can be a full url like `http://example.com/storybook/docs/documentation.json` or a relative path to the current storybook instance like `../dist/docs/documentation.json`.
-
-You can also provide `data` property to be something like `require('<DOCS_DIR_PATH>/documentation.json')`, this way you don't need to call `setCompodocJson` method, it will be called automatically on your behalf, and the docs will be stored in memory for later usage.
-
-### Source Code
-- This feature relies on the documentation loaded previously from `compodoc` to display the source code of the components and/or services that exists in the `moduleMetadata`.
-- You don't need to re-declare your main component in the `declarations` section of `moduleMetadata`, it will be added directly.
-- Basically, the addon will retrieve the source code of any class under `declarations` or `providers`, along with templates & styles for the components if they exist.
-- No setup is needed for this feature, it is enabled by default.
-- You can disable it by using global or story parameters like so:
-  ```jsx
-  parameters: {
-    sourceCode: {
-        disable: true
-    }
-  }
-  ```
-
-### Wrappers Selector
-
--   This feature uses `componentWrapperDecorator` from the official `@storybook/angular` to render wrapper elements dynamically around stories.
--   This simply reads a list of pre-defined wrapper elements from the global parameters or each individual story parameters.
--   This allows you to change the wrapper element during runtime instead of having static decorator all the time.
--   This is very helpful specially if you want to see how your components render inside a root component with header and footer, or just simply inside a specific parent element.
-
-**Configuration**
-
--   This toolbar menu works very similar to the official `@storybook/addon-backgrounds` addon.
--   The configuration looks something like this:
-
-In `preview.js` or `preview.ts`:
-
-```tsx
-export const parameters = {
-    wrappers: {
-        disable: false,
-        default: 'None',
-        values: [
-            { name: 'None', value: '' },
-            { name: 'Container', value: 'app-container' },
-            { name: 'Root', value: 'app-root' },
-        ],
-    },
-};
-```
-
-In a story file like `button.stories.ts`:
-
-```tsx
-import { type StoryObj, type Meta } from '@storybook/angular';
-import Button from './button.component';
-
-const meta: Meta<Button> = {
-    title: 'Example/Button',
-    component: Button,
-    parameters: {
-        wrappers: {
-            default: 'None',
-            values: [
-                { name: 'None', value: '' },
-                {
-                    name: 'Button Container',
-                    value: 'btn-container',
-                    options: {
-                        class: 'small',
-                        style: 'padding:5px;',
-                    },
-                },
-                { name: 'Container', value: 'app-container' },
-                { name: 'Root', value: 'app-root' },
-            ],
-        },
-    },
-};
-
-export default meta;
-```
-
-The wrapper item can also contain an `options` property which will be translated into HTML attributes for the wrapper. For example; the configuration above will render the following if `Button Container` is selected:
-
-```html
-<btn-container class="small" style="padding:5px;"></btn-container>
-```
-
-## Framework Agnostic Features
-
-These features currently residing within this addon might be moved to another addon in the future for separation of concerns purposes.
-
--   💻 Console Logs Panel
--   📃 Auto Markdown & HTML Docs support
--   👨‍💻 Swagger/OpenAPI Integration
-
-### Console Logs
-
--   This feature uses the `Actions` panel from `@storybook/addon-actions` to display the console output.
--   This is helpful if you need to focus on the console output of the application.
--   To enable the feature use the parameters in `preview.js` like so:
-
-```jsx
-export const parameters = {
-    console: {
-        disable: false,
-        patterns: [/^dev$/],
-        omitFirst: true,
-    },
-};
-```
-
-Currently, the patterns property is used to match the first argument of the `console` methods `debug`, `log`, `info`, `warn`& `error`. This allows developers to use special context for their app logs. For example: `console.log('dev', data);` will be matched using the `/^dev$/` pattern, and will trigger an action that shows up in the `Actions` panel. You can use the `omitFirst` property to make sure the `dev` item does not show, only other arguments will show up.
-
-### Auto Markdown/HTML Support
-This feature, I personally wanted to make available for all frameworks not just `Angular`. Therefore, I created another [`Markdown Docs`](https://www.npmjs.com/package/@sheriffmoose/storybook-md) addon which is now available for integration with zero-config. Huge thanks to the `Storybook` team and specially [`@shilman`](https://github.com/shilman) for the support and amazing feedback.
-
-This is enabled and ignores `.component.html` files by default, you can pass an option to disable it like so:
-
-```js
-// .storybook/main.js
-module.exports = {
-    addons: [
-        {
-            name: '@sheriffmoose/storybook-ngx',
-            options: {
-                disableMarkdown: true
-            }
-        }
-    ]
-}
-```
-
-### Swagger/OpenAPI Integration
-OpenAPI (formly Swagger) is a popular specification for the management of RESTful APIs. Usually OpenAPI produces a `openapi.yml` or `openapi.json` file that can be used to integrate/visualize the APIs configured on the backend server.
-
-`Swagger UI` is a popular framework for the visualization of the `openapi.yml|json` files that allow comprehensive documentation + testing for the backend API services. 
-
-Thanks to the pre available `swagger-ui-react`, this feature simply integrates `SwaggerUI` component into one `.mdx` file and make it available on demand if the user decides to populate the `openapiURL` option when configuring the addon like so:
-
-```js
-// .storybook/main.js
-module.exports = {
-    addons: [
-        {
-            name: '@sheriffmoose/storybook-ngx',
-            options: {
-                openapiURL: 'https://petstore3.swagger.io/api/v3/openapi.json'
-            }
-        }
-    ]
-}
-```
+| Feature | Previously | New Addon |
+| --- | --- | --- |
+| 📔 Coverage Instrumentation for Test-Runner | @sheriffMoose/storybook-ngx | @storybook-extras/coverage |
+| 🧪 Auto injector for Angular services | @sheriffMoose/storybook-ngx | @storybook-extras/angular |
+| 🦥 Lazy loading documentation | @sheriffMoose/storybook-ngx | @storybook-extras/angular |
+| 💬 Source code display | @sheriffMoose/storybook-ngx | @storybook-extras/angular |
+| 🌯 Story Wrappers selector toolbar | @sheriffMoose/storybook-ngx | @storybook-extras/angular |
+| 📃 Auto Markdown & HTML Docs support | @sheriffMoose/storybook-md | @storybook-extras/markdown |
+| 💻 Console Logs Panel | Part of @sheriffMoose/storybook-ngx | @storybook-extras/console |
+| 👨‍💻 Swagger/OpenAPI Integration | Part of @sheriffMoose/storybook-ngx | @storybook-extras/swagger |
 
 ## Credits
 
@@ -320,16 +99,6 @@ module.exports = {
 -   Thanks for `@storybook/addon-backgrounds` for the inspiration for the `wrappers selector` feature.
 -   This would not have been possible without the official `@storybook/angular` framework.
 -   Thanks for the team behind the official `Storybook Addon Kit` specially [`@winkerVSbecks`](https://github.com/winkerVSbecks) for the amazing work they put into this kit that was very helpful for generating this addon.
-
-## Roadmap
-Please feel free to request features, I will try to add them as soon as humanly possible. Currently the following features are in my pipeline:
-- UI representation of Angular Service.
-- UI representation for Issues/Pull Requests (Github/Bitbucket/Jira)
-- Coverage Enhancements
-- Story Source representation
-
-
-
 
 
 
