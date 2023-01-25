@@ -26,9 +26,6 @@ jobs:
           key: ${{ runner.os }}-node_modules
           path: node_modules
 
-      - name: Build Addon
-        run: yarn build
-          
       - name: Build Storybook
         run: yarn build-storybook
 
