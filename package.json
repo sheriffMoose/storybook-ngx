@@ -125,7 +125,7 @@
     "storybook": "7.0.0-beta.31",
     "typescript": "4.8.2",
     "zone.js": "~0.11.4",
-    "zx": "^1.14.1"
+    "zx": "^7.1.1"
   },
   "peerDependencies": {
     "@storybook/addons": "7.0.0-beta.31",
