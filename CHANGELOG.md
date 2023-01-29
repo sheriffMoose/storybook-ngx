@@ -1,3 +1,18 @@
+# v1.0.43 (Sun Jan 29 2023)
+
+#### ⚠️ Pushed to `master`
+
+- remove prerelease script (mosherif87@gmail.com)
+- update logo url (mosherif87@gmail.com)
+- update workflows (mosherif87@gmail.com)
+- use @storybook-extras (mosherif87@gmail.com)
+
+#### Authors: 1
+
+- Mostafa Sherif ([@sheriffMoose](https://github.com/sheriffMoose))
+
+---
+
 # v1.0.42 (Mon Jan 23 2023)
 
 #### ⚠️ Pushed to `master`
